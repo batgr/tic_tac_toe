@@ -71,7 +71,7 @@ def winner(board):
         if board[i][0] == board[i][1] == board[i][2] and board[i][0] != EMPTY:
             return board[i][0]
         if board[0][i] == board[1][i] == board[2][i] and board[0][i] != EMPTY:
-            return board[i][0]
+            return board[0][i]
 
     if board[0][0] == board[1][1] == board[2][2] and board[0][0] != EMPTY:
         return board[0][0]
@@ -118,26 +118,28 @@ def minimax(board):
     """
     if terminal(board):
         return None
-
+    alpha = float('-inf')
+    beta = float('inf')
+    # player x try to maximize the score
     if player(board) == X:
         best_value = float('-inf')
         best_action = None
 
         for action in actions(board):
-            value = minvalue(result(board,action))
+            value = minvalue(result(board,action),alpha, beta)
 
             if value > best_value:
                 best_value = value
                 best_action = action
         return best_action
 
-
+    # player O try to minimize the score
     if player(board) == O:
         best_value = float('inf')
         best_action = None
 
         for action in actions(board):
-            value = maxvalue(result(board,action))
+            value = maxvalue(result(board,action),alpha, beta)
 
             if value < best_value:
                 best_value = value
@@ -145,23 +147,31 @@ def minimax(board):
         return best_action
 
 
-def maxvalue(board):
+def maxvalue(board,alpha,beta):
     if terminal(board):
         return utility(board)
 
     value = float('-inf')
 
     for action in actions(board):
-        value = max(value, minvalue(result(board,action)))
+        value = max(value, minvalue(result(board,action),alpha,beta))
+        if value >= beta:
+            return value
+        if value > alpha:
+            alpha = value
     return value
 
 
-def minvalue(board):
+def minvalue(board,alpha,beta):
     if terminal(board):
         return utility(board)
 
     value = float('inf')
 
     for action in actions(board):
-        value = min(value, maxvalue(result(board,action)))
+        value = min(value, maxvalue(result(board,action),alpha, beta))
+        if value <= alpha:
+            return value
+        if value < beta:
+            beta = value
     return value
